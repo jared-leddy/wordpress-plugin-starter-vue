@@ -1,4 +1,4 @@
-![image](https://res.cloudinary.com/evanagee/image/upload/v1580244758/VueWP/VWP-hero.png)
+![image](_repo/vue-wordpress-logo.png)
 
 # vuejs-wordpress-plugin-starter
 
