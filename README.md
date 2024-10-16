@@ -1,3 +1,6 @@
+** Notice: **
+This is a forked repo from [EvanAgee/vuejs-wordpress-plugin-starter](https://github.com/EvanAgee/vuejs-wordpress-plugin-starter). Evan hasn't updated this repo in over 4 years, so we decided to fork it and manage our own version. This is still the same product, but we hope we can make it better.
+
 ![image](_repo/vue-wordpress-logo.png)
 
 # vuejs-wordpress-plugin-starter
