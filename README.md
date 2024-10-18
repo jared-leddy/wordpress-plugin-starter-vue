@@ -55,6 +55,7 @@ Our goal here is to make plugin development easier with Vue. While we didn't ori
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#build-logic">Build Logic</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -107,10 +108,10 @@ nvm use
 
 Before you start working, you will need to rename all of the correct files, functions, assets, etc. **BEFORE** you run `npm install`. This setp is also about naming your plugin with your own namespacing.
 
-1. Search and replace the repo for any occurances of `vwp-plugin`.
-2. Search and replace the repo for any occurances of `vwp_plugin`.
-3. Search and replace the repo for any occurances of `VwpPlugin`.
-4. Manually rename any files that are prefixed with `vwp-plugin`.
+1. Search and replace **the entire repo** for any occurances of `vwp-plugin`.
+2. Search and replace **the entire repo** for any occurances of `vwp_plugin`.
+3. Search and replace **the entire repo** for any occurances of `VwpPlugin`.
+4. Manually rename any files in **the entire repo** that are prefixed with `vwp-plugin`.
 
 ### Clean Unused Files
 
@@ -171,6 +172,104 @@ Below, you will find our common commands and notes for general usage.
 3. The `admin/index.php` is the base PHP template for the plugin settings admin page UI. It has an element `<div id="app"></div>` where the Vue app is getting mounted.
 
 4. The provided Vue template can be found in `src/vue/App.vue`.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- BUILD PROCESS LOGIC -->
+
+## Build Logic
+
+### Vite Build
+
+Vite will convert all of your `.ts` to `.js` and all `.scss` to `.css`. THey will all be placed in a `/dist` folder.
+
+### Build Package
+
+This covers the series of tasks that are used to initially build the plugin folder. Found in both `build:dev` and `build:prod` scripts.
+
+1. Verify Folders Exist
+
+   - Here, we are checking to see if you have manually created your plugin folder. If you have not already created your plugin folder, we will create one for you.
+   - This folder needs to be present for subsequent tasks.
+
+2. Copy Files to Folder
+
+   - Here, we are copying your entire `/src` folder contents into your plugin folder.
+
+3. Move Assets from Dist
+   - Vite is run before Gulp. All of your `.js` and `.css` files will be located there.
+   - For this task, those files built into the `/dist` folder get moved into your plugin folder.
+
+### Clean Package
+
+This covers the series of tasks that are used to clean up the plugin folder. Found in both `build:dev` and `build:prod` scripts.
+
+1. Delete Trivial Files
+   - Here, we delete all of the trivial files.
+
+A trivial file typically refers to a file that contains very little or no meaningful content. These files often have minimal or placeholder code, which serves little purpose in the context of a larger project. In the context of software builds and packaging, trivial files are usually considered unnecessary and can be removed to optimize the final package.
+
+Here are some common examples of trivial files:
+
+- **Empty files:** Files that have no content at all.
+- **Export placeholder files:** Files that contain only trivial exports like export {};, often created to satisfy module systems but don't serve any real purpose.
+- **_Files with a single constant or trivial content:_** For example, a file that only defines a single constant but is never used meaningfully. See examples below:
+
+Empty File:
+
+```ts
+// This is a completely empty file
+```
+
+Export Placeholder:
+
+```ts
+export {};
+```
+
+Trivial Content:
+
+```ts
+const someVar = 'value'; // A single trivial statement with no broader impact
+```
+
+Removing these files can help reduce clutter, decrease the size of your final builds, and improve overall project performance.
+
+2. Delete TypeScript Files
+
+   - Delete all files with a `.ts` extension from the plugin folder . We have already used Vite to build these `.js` files, so we don't need to retain them.
+
+3. Delete SCSS Files
+
+   - Delete all files with a `.scss` extension from the plugin folder . We have already used Vite to build these `.css` files, so we don't need to retain them.
+
+4. Clean PHP Folder
+
+   - The majority of our PHP is located in `/src/php`.
+   - During the move step above, we are moving this `php` folder into out plugin folder.
+     - Example: `/vwp-plugin/php`
+   - Here in this task, we will move all of those contents up a tree level (i.e., to `/vwp-plugin`).
+   - This step will leave an empty `php` folder intentionally.
+
+5. Delete Empty Folders
+
+   - Deleting files out of our plugin folder, and moving the PHP files up a level, will leave empty folders lying around.
+   - Here, we will recursively delete all empty folders from the parent plugin folder (i.e., `/vwp-plugin`).
+
+### Clean Project
+
+This covers the series of tasks that are used to clean up the plugin folder after the zip file is created. Found in both `build:dev` and `build:prod` scripts.
+
+1. Delete Folders
+
+   - Delete the `/dist` folder that is generated by Vite.
+   - Delete the plugin folder (i.e., `/vwp-plugin`).
+
+### Zip Project
+
+For this one, we will "compress" or "zip" the plugin folder. This is the step that will produce the final plugin zip file that you upload into the WordPress website. Since this one is just a task, we don't have a need to do anything more than zip the folder.
+
+Found in `build:prod` script.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
