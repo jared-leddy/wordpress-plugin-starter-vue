@@ -1,21 +1,71 @@
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+// Core Modules
 import { resolve } from 'path';
+import { existsSync, readFileSync } from 'fs';
+
+// NPM Modules
+import vue from '@vitejs/plugin-vue';
+import { glob } from 'glob';
+import { defineConfig } from 'vite';
+
+// Use glob to find all valid TypeScript and Vue files, excluding .d.ts files
+const jsEntryPoints = glob.sync(resolve(__dirname, 'src/**/*.ts')).filter((file) => !file.endsWith('.d.ts'));
+
+// Create an input object where each JS/TS file is treated as a separate entry
+const inputFiles = jsEntryPoints.reduce((entries, file) => {
+  const name = file.replace(/.*[\\\/]/, '').replace(/\.ts$/, ''); // Use filename without extension as entry name
+  entries[name] = file;
+  return entries;
+}, {});
+
+// Add the SCSS entry point explicitly
+inputFiles['styles'] = resolve(__dirname, 'src/assets/scss/styles.scss');
+
+// Function to check if a file is empty or trivial
+function isOriginalFileEmptyOrTrivial(filePath: string) {
+  // Skip transformed files with query params like '?vue&type=script'
+  if (filePath.includes('?')) {
+    return false;
+  }
+
+  // Check if the file exists and read its contents
+  if (!existsSync(filePath)) {
+    return false;
+  }
+
+  const content = readFileSync(filePath, 'utf-8').trim();
+  return !content || content === 'export {};' || content.length < 10;
+}
 
 export default defineConfig({
-    plugins: [vue()],
-    build: {
-        rollupOptions: {
-            input: resolve(__dirname, 'src/main.ts'),
-            output: {
-                dir: 'dist',
-                entryFileNames: 'assets/[name].js',
-                chunkFileNames: 'assets/[name].js',
-                assetFileNames: 'assets/[name].[ext]'
-            }
+  plugins: [vue()],
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      input: inputFiles, // Use the dynamically created input object
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: (assetInfo) => {
+          // Explicitly name styles.scss as styles.css
+          if (assetInfo.name === 'styles.css' || assetInfo.name === 'styles.scss') {
+            return 'assets/styles.css';
+          }
+          return 'assets/[name].[ext]'; // Default behavior for other assets
         },
-        outDir: 'dist',
-        emptyOutDir: true,
-        sourcemap: true
+        manualChunks(id) {
+          // Exclude files that are minimal or trivial
+          if (isOriginalFileEmptyOrTrivial(id)) {
+            return undefined; // Do not create a chunk for empty files
+          }
+        }
+      }
     }
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "src/assets/scss/_config.scss" as config;` // Global SCSS import
+      }
+    }
+  }
 });
