@@ -45,31 +45,6 @@ function moveFolderContents(sourceDir, targetDir) {
   });
 }
 
-// Function to recursively remove empty directories
-function removeEmptyDirsRecursively(dir) {
-  const files = fs.readdirSync(dir);
-  if (files.length === 0) {
-    fs.rmdirSync(dir);
-    console.log(`Deleted empty directory: ${dir}`);
-  } else {
-    // Check each directory if it's empty after moving files
-    files.forEach((file) => {
-      const filePath = path.join(dir, file);
-      const stat = fs.statSync(filePath);
-
-      if (stat.isDirectory()) {
-        removeEmptyDirsRecursively(filePath); // Recurse into subdirectories
-      }
-    });
-    // Try to remove the directory again after processing subdirectories
-    const remainingFiles = fs.readdirSync(dir);
-    if (remainingFiles.length === 0) {
-      fs.rmdirSync(dir);
-      console.log(`Deleted empty directory: ${dir}`);
-    }
-  }
-}
-
 // Gulp task to move PHP folder contents to root and delete the PHP folder
 gulp.task('clean-php-folder', function (done) {
   const phpDir = path.resolve(__dirname, 'vwp-plugin/php');
@@ -84,9 +59,6 @@ gulp.task('clean-php-folder', function (done) {
 
   // Move the contents of the PHP directory to the root, retaining subfolders
   moveFolderContents(phpDir, rootDir);
-
-  // Remove the now-empty PHP directory recursively
-  removeEmptyDirsRecursively(phpDir);
 
   done();
 });
@@ -277,8 +249,8 @@ gulp.task(
     'delete-trivial-files',
     'delete-ts-files',
     'delete-scss-files',
-    'delete-empty-folders',
     'clean-php-folder',
+    'delete-empty-folders',
     function (done) {
       console.log('Package cleaned successfully!');
       done();
