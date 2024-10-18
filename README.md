@@ -126,14 +126,18 @@ There are a few instances where you may not need the starting files and folder s
 
 3. TypeScript Types: `/src/utils/types`
 
-   - If you don't end up adding or updating this folder, then you can remove it.
+   - If you don't end up adding to or updating this folder, then you can remove it.
 
 4. TypeScript Enumerations: `/src/utils/enums`
 
-   - If you don't end up adding or updating this folder, then you can remove it.
+   - If you don't end up adding to or updating this folder, then you can remove it.
 
 5. TypeScript Interfaces: `/src/utils/interfaces`
-   - If you don't end up adding or updating this folder, then you can remove it.
+
+   - If you don't end up adding to or updating this folder, then you can remove it.
+
+6. Vue Components: `/src/components`
+   - If you don't end up adding to or updating this folder, then you can remove it.
 
 ### Installation
 
