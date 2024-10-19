@@ -1,5 +1,6 @@
 // Core Modules
-import { resolve } from 'path';
+import { exec } from 'child_process';
+import path, { resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
 
 // NPM Modules
@@ -37,7 +38,29 @@ function isOriginalFileEmptyOrTrivial(filePath: string) {
 }
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue(),
+    {
+      name: 'watch-src-folder-and-run-script',
+      handleHotUpdate({ file, server }) {
+        const relativeFilePath = path.relative(server.config.root, file);
+
+        // Only trigger when files in the /src folder are changed
+        if (relativeFilePath.startsWith('src/')) {
+          console.log(`File in /src changed: ${file}`);
+
+          // Trigger your custom NPM script
+          exec('npm run build:dev', (err, stdout, stderr) => {
+            if (err) {
+              console.error(`Error running script: ${err}`);
+              return;
+            }
+            console.log(`Script output: ${stdout}`);
+          });
+        }
+      }
+    }
+  ],
   build: {
     outDir: 'dist',
     rollupOptions: {
