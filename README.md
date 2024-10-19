@@ -150,7 +150,11 @@ There are a few instances where you may not need the starting files and folder s
    ```zsh
    npm install
    ```
-3. There is no working `start` or a `build watch` command. We have an open issue for this.
+3. Run the start command to watch and build files.
+
+```zsh
+npm run start:dev
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -169,9 +173,15 @@ Below, you will find our common commands and notes for general usage.
 
    - When you build in prod, the plugin folder **IS ZIPPED** and ready for upload to a WP website.
 
-3. The `admin/index.php` is the base PHP template for the plugin settings admin page UI. It has an element `<div id="app"></div>` where the Vue app is getting mounted.
+3. Run `npm run start:dev`.
 
-4. The provided Vue template can be found in `src/vue/App.vue`.
+   - This is runs the default `vite` command. The terminal will tell you to open the browser to a `localhost` port. **We do not use the browser.**
+   - A custom hot reload plugin is located in the Vite config file to watch all files in the `/src` folder.
+   - Each time a file is changed, the hot reload will trigger a `npm run build:dev`.
+
+4. The `admin/index.php` is the base PHP template for the plugin settings admin page UI. It has an element `<div id="app"></div>` where the Vue app is getting mounted.
+
+5. The provided Vue template can be found in `src/vue/App.vue`.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
