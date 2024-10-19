@@ -5,18 +5,22 @@ const path = require('path');
 // NPM Modules
 const gulp = require('gulp');
 
-// Function to remove directories using Node's fs module
-function cleanDirectory(directory) {
-  if (fs.existsSync(directory)) {
-    fs.rmSync(directory, { recursive: true, force: true });
-  }
-}
-
-// Function to check if a file is trivial (e.g., contains just `export {};` or is nearly empty)
+// Function to check if a file is trivial (small or empty)
 function isTrivialFile(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8').trim();
-  // Check if the file is empty or contains trivial code like `export {};` or just a single constant
-  return !content || content === 'export {};' || content.length < 10;
+  const stat = fs.statSync(filePath);
+
+  // Ignore files larger than 1KB (adjust size as needed)
+  if (stat.size > 1024) {
+    return false;
+  }
+
+  // Read the file content to check if it's trivial (like 'export {};', empty files, etc.)
+  const content = fs.readFileSync(filePath, 'utf8').trim();
+
+  // Consider a file trivial if it is small, empty, or contains only export {}; or similar
+  return (
+    !content || content === 'export {};' || content === '{}' || content.length < 10 // Length threshold for trivial content
+  );
 }
 
 // Function to move contents of a directory to another directory, retaining folder structure
@@ -41,6 +45,22 @@ function moveFolderContents(sourceDir, targetDir) {
       // Move the file to the corresponding directory in the target path
       fs.renameSync(sourcePath, targetPath);
       console.log(`Moved ${sourcePath} to ${targetPath}`);
+    }
+  });
+}
+
+// Function to recursively check all files and remove trivial ones
+function removeTrivialFilesRecursively(dir) {
+  fs.readdirSync(dir).forEach((file) => {
+    const filePath = path.join(dir, file);
+    const stat = fs.statSync(filePath);
+
+    if (stat.isDirectory()) {
+      // Recursively handle directories
+      removeTrivialFilesRecursively(filePath);
+    } else if (isTrivialFile(filePath)) {
+      console.log(`Removing trivial file: ${filePath}`);
+      fs.unlinkSync(filePath); // Delete the trivial file
     }
   });
 }
@@ -157,24 +177,7 @@ gulp.task('delete-scss-files', function (done) {
 
 // Gulp task to remove trivial files after build
 gulp.task('delete-trivial-files', function (done) {
-  const distDir = path.resolve(__dirname, 'vwp-plugin'); // Change to vwp-plugin to operate on the package directory
-
-  // Function to recursively check all files and remove trivial ones
-  function removeTrivialFilesRecursively(dir) {
-    fs.readdirSync(dir).forEach((file) => {
-      const filePath = path.join(dir, file);
-      const stat = fs.statSync(filePath);
-
-      if (stat.isDirectory()) {
-        // Recursively handle directories
-        removeTrivialFilesRecursively(filePath);
-      } else if (isTrivialFile(filePath)) {
-        console.log(`Removing trivial file: ${filePath}`);
-        fs.unlinkSync(filePath); // Delete the trivial file
-      }
-    });
-  }
-
+  const distDir = path.resolve(__dirname, 'vwp-plugin'); // Set the directory to clean
   // Start recursive deletion in the vwp-plugin directory
   removeTrivialFilesRecursively(distDir);
   done();
