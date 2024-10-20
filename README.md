@@ -56,6 +56,7 @@ Our goal here is to make plugin development easier with Vue. While we didn't ori
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#build-logic">Build Logic</a></li>
+    <li><a href="#ui-frameworks">UI Frameworks</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -280,6 +281,30 @@ This covers the series of tasks that are used to clean up the plugin folder afte
 For this one, we will "compress" or "zip" the plugin folder. This is the step that will produce the final plugin zip file that you upload into the WordPress website. Since this one is just a task, we don't have a need to do anything more than zip the folder.
 
 Found in `build:prod` script.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- UI FRAMEWORKS -->
+
+## UI Frameworks
+
+As we go through and develop our own plugins using these frameworks, we will document what UI frameworks are working with this starter template.
+
+### Works Well
+
+- [Bootstrap](https://getbootstrap.com/)
+
+### Has Problems
+
+- [Naive UI](https://www.naiveui.com/)
+   - We tried using this in an admin-only plugin, but had issues trying to keep Vue loaded. There is an open issue for extensive testing.
+
+- [Vuetify](https://vuetifyjs.com/en/)
+   - We tried using this in an admin-only plugin, but ended up having to use `!important` in all of our styles. That's not the best use of a framework like this. There is an open issue for extensive testing.
+
+### Not Tested 
+
+- [Bootstrap Vue](https://bootstrap-vue.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
